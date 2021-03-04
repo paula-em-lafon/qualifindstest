@@ -21,18 +21,10 @@ def keys():
             # if there's no version in the request get the largest version
             if 'version' not in data:
                 value = keyvalue[data["key"]][max(keyvalue[data["key"]])]
-                resp_val = {"value": value}
-                resp = jsonify(resp_val)
-                resp.status_code = 200
-                return resp
             # if the key and version are availalbe return them
             else:
                 if data['version'] in keyvalue[data["key"]]:
                     value = keyvalue[data['key']][data["version"]]
-                    resp_val = {"value": value}
-                    resp = jsonify(resp_val)
-                    resp.status_code = 200
-                    return resp
                 # if key and version are not available
                 else:
                 # filter for values smaller than key
@@ -44,10 +36,11 @@ def keys():
                     # if value smaller exists return
                     else:
                         value = filteredDict[max(filteredDict)]
-                        resp_val = {"value": value}
-                        resp = jsonify(resp_val)
-                        resp.status_code = 200
-                        return resp
+            # add response value and return
+            resp_val = {"value": value}
+            resp = jsonify(resp_val)
+            resp.status_code = 200
+            return resp
 
     #the put method 
     elif request.method == 'PUT':
@@ -61,12 +54,9 @@ def keys():
         if data["key"] not in keyvalue:
             keyvalue[data["key"]]={current_version: data["value"]}
             resp_val = {"key": data["key"], "value": data["value"], "version": current_version}
-            resp = jsonify(resp_val)
-            resp.status_code = 200
-            return resp
 
         # If key exists
-        if data["key"] in keyvalue:
+        elif data["key"] in keyvalue:
             # check for if the key contains the value we have provided
             if data["value"] in keyvalue[data["key"]].values():
                 # check if the data exists in subsequent key versions
@@ -83,18 +73,17 @@ def keys():
                     keyappend += 1
                 resp_val = {"key": data["key"] + keyappstr, "value": data["value"],\
                      "version": current_version}
-                resp = jsonify(resp_val)
-                resp.status_code = 200
-                return resp
             # if value doesn't exist in key being searched add the value along with
             # the corresponding version number
             else:
                 keyvalue[data["key"]][current_version] = data["value"]
                 resp_val = {"key": data["key"], "value": data["value"],\
                      "version": current_version}
-                resp = jsonify(resp_val)
-                resp.status_code = 200
-                return resp
+        # add response value and return
+        print(keyvalue)
+        resp = jsonify(resp_val)
+        resp.status_code = 200
+        return resp
 
 @app.errorhandler(404)
 def resource_not_found(e):

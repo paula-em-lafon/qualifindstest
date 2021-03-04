@@ -26,9 +26,6 @@ def keys():
                 ready_values.append(elem)
             if ready_values:
                 return_value = max(ready_values, key=lambda d: d['version'])
-                resp = jsonify({"value":return_value['value']})
-                resp.status_code = 200
-                return resp
             else:
                 abort(404, "the key is not available")
         if 'key' in data and 'version' in data:
@@ -38,11 +35,14 @@ def keys():
                 ready_values.append(elem)
             if ready_values:
                 return_value = max(ready_values, key=lambda d: d['version'])
-                resp = jsonify({"value":return_value['value']})
-                resp.status_code = 200
-                return resp
             else:
                 abort(404, "the key, version pair is not available")
+        
+        # add response value and return
+        resp = jsonify({"value":return_value['value']})
+        resp.status_code = 200
+        return resp
+        
     # Put request handling
     elif request.method == 'PUT':
         data = request.get_json()
@@ -52,10 +52,6 @@ def keys():
         if not any(d['key'] == data['key'] and d['value'] == data['value'] for d in keyvalue):
             current_version += 1
             new_entry = {"key": data['key'], "value": data['value'], "version": current_version}
-            keyvalue.append(new_entry)
-            resp = jsonify(new_entry)
-            resp.status_code = 200
-            return resp
         # if key value pair exists 
         else:
             current_version += 1
@@ -69,10 +65,12 @@ def keys():
                         "value": data['value'], "version": current_version}
                     break
                 keyappend += 1
-            keyvalue.append(new_entry)
-            resp = jsonify(new_entry)
-            resp.status_code = 200
-            return resp
+        
+        # add response value and return
+        keyvalue.append(new_entry)
+        resp = jsonify(new_entry)
+        resp.status_code = 200
+        return resp
 
 @app.errorhandler(404)
 def resource_not_found(e):
