@@ -4,6 +4,10 @@
 
 this repository contains two versions of the same app. They both have the exact same features but version 2 implements more hashing in order to increase performance. For instance instead of looking through all the different attributes to find out if a key exists it only need look for the key. At the moment of retrieval the key is found instantaneously instead of having to go through all the different entries. Some tradeoffs had to be made in order to have a cohesive data structure, but in general version 2 should be faster than version one.
 
+Edit: After handing in the application I got to thinking and it came up to me that binary search trees would be more efficient in handling the application as it was provided so I implemented them in app3.py with dependencides tree1 and tree2. I understand these changes were made after the deadline but I believe it is still worth it to present them since they are implemented in a correct manner and, should the internal memory have to handle thousands of requests, it could be a great improvement over the app that already existed. 
+
+Thank you for your consideration :)
+
 ## Running the app ##
 
 To run version 1 one needs to type the following two commands:
