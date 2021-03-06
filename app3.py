@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify, abort
-from tree1 import Node, AVLTree
+from tree1 import AVLTree
+from tree2 import AVLTree2
 
 app = Flask(__name__)
 
@@ -21,22 +22,22 @@ def keys():
         else:
             # if there's no version in the request get the largest version
             if 'version' not in data:
-                value = keyvalue[data["key"]][max(keyvalue[data["key"]])]
+                value = keyvalue[data["key"]].maximum(keyvalue[data["key"]].root)
             # if the key and version are availalbe return them
             else:
-                if data['version'] in keyvalue[data["key"]]:
-                    value = keyvalue[data['key']][data["version"]]
+                if keyvalue[data["key"]].searchTree(data["version"]):
+                    value = keyvalue[data["key"]].searchTree(data["version"])
                 # if key and version are not available
                 else:
                 # filter for values smaller than key
-                    filteredDict = dict(filter(lambda elem: elem[0] <= data["version"],\
-                         keyvalue[data["key"]].items()))
+                    largest_version = keyvalue[data["key"]].\
+                        findlargestleft(data["version"], keyvalue[data["key"]].root)
                     # if the value doesn't exist return an error
-                    if not filteredDict:
+                    if largest_version == None:
                         abort(404, "the key, version pair is not available")
                     # if value smaller exists return
                     else:
-                        value = filteredDict[max(filteredDict)]
+                        value = largest_version
             # add response value and return
             resp_val = {"value": value}
             resp = jsonify(resp_val)
@@ -53,7 +54,8 @@ def keys():
         
         # if the key doesn't exist create it along with the entry
         if data["key"] not in keyvalue:
-            keyvalue[data["key"]]={current_version: data["value"]}
+            keyvalue[data["key"]]= AVLTree2()
+            keyvalue[data["key"]].insert(current_version, data["value"])
             quicktrees[data["key"]]= AVLTree()
             quicktrees[data["key"]].insert(data["value"])
             resp_val = {"key": data["key"], "value": data["value"], "version": current_version}
@@ -68,12 +70,13 @@ def keys():
                 while True:
                     keyappstr = str(keyappend)
                     if not keyvalue.get(data["key"] + keyappstr):
-                        keyvalue[data["key"]+ keyappstr] = {current_version: data["value"]}
+                        keyvalue[data["key"] + keyappstr]= AVLTree2()
+                        keyvalue[data["key"] + keyappstr].insert(current_version, data["value"])
                         quicktrees[data["key"] + keyappstr]= AVLTree()
                         quicktrees[data["key"]+ keyappstr].insert(data["value"])
                         break
                     elif quicktrees[data["key"]+ keyappstr].searchTree(data["value"]) == None:
-                        keyvalue[data["key"]+ keyappstr][current_version] = data["value"]
+                        keyvalue[data["key"] + keyappstr].insert(current_version, data["value"])
                         quicktrees[data["key"]+ keyappstr].insert(data["value"])
                         break
                     keyappend += 1
@@ -82,6 +85,7 @@ def keys():
             # if value doesn't exist in key being searched add the value along with
             # the corresponding version number
             else:
+                keyvalue[data["key"]].insert(current_version, data["value"])
                 quicktrees[data["key"]].insert(data["value"])
                 resp_val = {"key": data["key"], "value": data["value"],\
                      "version": current_version}
