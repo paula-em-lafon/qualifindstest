@@ -8,6 +8,23 @@ Edit: After handing in the application I got to thinking and it came up to me th
 
 Thank you for your consideration :)
 
+## installing ##
+
+If you have virtual environment installed in your computer create a new virtual environment with the command:
+
+`$ virtualenv venv`
+
+at the root of the project.
+
+
+Run the virtual environment using the following command:
+
+`$ source venv/bin/activate`
+
+Install the requirements on the virtual environment by running:
+
+`$ pip install -r requirements.txt`
+
 ## Running the app ##
 
 To run version 1 one needs to type the following two commands:
